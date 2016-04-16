@@ -2,6 +2,8 @@ package org.refeed.shapesorter
 
 import scalaz.\/
 
+import org.refeed.shapesorter.Cast.Result
+
 trait Cast[+A] {
 
   def cast(value: Any): Cast.Result[A]
@@ -10,7 +12,15 @@ trait Cast[+A] {
     *
     * Use it only with functions that cannot fail.
     */
-  def map[B](f: A => B): Cast[B] = new TransformCast(this, f)
+  def map[B](f: A => B): Cast[B] = new MapCast(this, f)
+
+  def flatMap[B](f: A => Cast[B]): Cast[B] = new FlatMapCast(this, f)
+
+  /** Provides a cast that never fails as the result is reified */
+  def reify: Cast[Result[A]] = new ReifiedCast[A](this)
+
+//  def unreify[B](implicit f: A <:< Result[B]): Cast[B] = new FlatMapCast[A, B](this, a => f(a))
+
 }
 
 object Cast {
@@ -23,6 +33,10 @@ object Cast {
     def withContext(enclosingContext: String): Error = copy(context = enclosingContext +: context)
   }
 
+  /** Lifts any function to a cast */
+  def lift[A: Manifest, B](f: A => B): Cast[B] = Cast.to[A].map(f)
+
+  // TODO: handling of wrapped primitives
   def to[A](implicit ev: Manifest[A]): Cast[A] = new SimpleCast(ev)
 
   def toList[A: Manifest]: Cast[List[A]] = toList(Cast.to[A])

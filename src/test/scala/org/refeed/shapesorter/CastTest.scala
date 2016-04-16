@@ -61,4 +61,26 @@ class CastTest extends FlatSpec with ShouldMatchers {
     val symCast = stringCast.map(Symbol.apply)
     symCast.cast("symbol") shouldBe 'symbol.right
   }
+
+  it should "be flat-mapped into a cast that depends on an intermediate value" in {
+    val complexCast = stringCast.flatMap {
+      case "null" => ConstCast.to(None)
+      case _ => Cast.lift(Some.apply[String])
+    }
+    complexCast.cast("null") shouldBe None.right
+    complexCast.cast("valid") shouldBe Some("valid").right
+  }
+
+  it should "be reify to access cast errors as values" in {
+    val cast = stringCast.reify
+    cast.cast("hello") shouldBe "hello".right.right
+    cast.cast(1) shouldBe
+      Error("cannot cast java.lang.Integer to java.lang.String", value = 1).left.right
+  }
+
+  "Any function" should "be lifted to a cast" in {
+    val cast = Cast.lift((n: Integer) => n.toString)
+    cast.cast(3) shouldBe "3".right
+    cast.cast("hi") shouldBe 'left
+  }
 }
