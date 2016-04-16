@@ -25,5 +25,7 @@ object Cast {
 
   def to[A](implicit ev: Manifest[A]): Cast[A] = new SimpleCast(ev)
 
-  def toList[A: Manifest]: Cast[List[A]] = new ListCast(Cast.to[A])
+  def toList[A: Manifest]: Cast[List[A]] = toList(Cast.to[A])
+
+  def toList[A](elemCast: Cast[A]): Cast[List[A]] = new ListCast(elemCast)
 }

@@ -51,6 +51,12 @@ class CastTest extends FlatSpec with ShouldMatchers {
     ).left
   }
 
+  "Casting to a seq given an element cast" should "succeed if all the elements can de casted" in {
+    val someList = List("1", "2", "3")
+    val cast = Cast.toList(Cast.to[String])
+    cast.cast(someList) shouldBe someList.right
+  }
+
   "A cast" should "be mapped into a cast making some transformation" in {
     val symCast = stringCast.map(Symbol.apply)
     symCast.cast("symbol") shouldBe 'symbol.right
