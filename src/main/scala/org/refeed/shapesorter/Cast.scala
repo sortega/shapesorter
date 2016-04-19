@@ -36,7 +36,6 @@ object Cast {
   /** Lifts any function to a cast */
   def lift[A: Manifest, B](f: A => B): Cast[B] = Cast.to[A].map(f)
 
-  // TODO: handling of wrapped primitives
   def to[A](implicit ev: Manifest[A]): Cast[A] = new SimpleCast(ev)
 
   def toList[A: Manifest]: Cast[List[A]] = toList(Cast.to[A])

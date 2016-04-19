@@ -26,6 +26,48 @@ class CastTest extends FlatSpec with ShouldMatchers {
       Error("cannot cast scala.collection.immutable.Set.EmptySet$ to java.lang.String", invalid).left
   }
 
+  "Casting to an unboxed primitive" should "succeed for integers" in {
+    val intCast = Cast.to[Int]
+    intCast.cast(10: Int) shouldBe 10.right
+    intCast.cast(10: Integer) shouldBe 10.right
+  }
+
+  it should "succeed for longs" in {
+    val cast = Cast.to[Long]
+    cast.cast(10L: Long) shouldBe 10L.right
+    cast.cast(10L: java.lang.Long) shouldBe 10L.right
+  }
+
+  it should "succeed for bytes" in {
+    val cast = Cast.to[Byte]
+    cast.cast(10.toByte) shouldBe 10.toByte.right
+    cast.cast(10.toByte: java.lang.Byte) shouldBe 10.toByte.right
+  }
+
+  it should "succeed for floats" in {
+    val cast = Cast.to[Float]
+    cast.cast(1.1f: Float) shouldBe 1.1f.right
+    cast.cast(1.1f: java.lang.Float) shouldBe 1.1f.right
+  }
+
+  it should "succeed for doubles" in {
+    val cast = Cast.to[Double]
+    cast.cast(1.1d: Double) shouldBe 1.1d.right
+    cast.cast(1.1d: java.lang.Double) shouldBe 1.1d.right
+  }
+
+  it should "succeed for characters" in {
+    val cast = Cast.to[Char]
+    cast.cast('a': Char) shouldBe 'a'.right
+    cast.cast('a': Character) shouldBe 'a'.right
+  }
+
+  it should "succeed for booleans" in {
+    val cast = Cast.to[Boolean]
+    cast.cast(true: Boolean) shouldBe true.right
+    cast.cast(true: java.lang.Boolean) shouldBe true.right
+  }
+
   "Casting to a seq of a given class" should "succeed for values of the right class" in {
     val someList = List("1", "2", "3")
     stringsCast.cast(someList) shouldBe someList.right
