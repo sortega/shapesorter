@@ -19,8 +19,12 @@ trait Cast[+A] {
   /** Provides a cast that never fails as the result is reified */
   def reify: Cast[Result[A]] = new ReifiedCast[A](this)
 
-//  def unreify[B](implicit f: A <:< Result[B]): Cast[B] = new FlatMapCast[A, B](this, a => f(a))
-
+  /** Inverse of [[reify]] */
+  def unreify[B](implicit f: A <:< Result[B]): Cast[B] =
+    new FlatMapCast[A, B](this, a => f(a).fold(
+      l = ConstCast.failing,
+      r = ConstCast.to
+    ))
 }
 
 object Cast {

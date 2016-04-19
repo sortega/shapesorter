@@ -120,6 +120,13 @@ class CastTest extends FlatSpec with ShouldMatchers {
       Error("cannot cast java.lang.Integer to java.lang.String", value = 1).left.right
   }
 
+  it should "undo a cast reification" in {
+    val cast = stringCast.reify.unreify
+    cast.cast("hello") shouldBe "hello".right
+    cast.cast(1) shouldBe
+      Error("cannot cast java.lang.Integer to java.lang.String", value = 1).left
+  }
+
   "Any function" should "be lifted to a cast" in {
     val cast = Cast.lift((n: Integer) => n.toString)
     cast.cast(3) shouldBe "3".right
